@@ -1,65 +1,64 @@
-import Image from "next/image";
+'use client'
+import { useState } from 'react'
+import { type RollData, getRollData } from './data/dice-data';
+import { DiceDisplay } from './components/DiceDisplay';
+import {
+  Button,
+  Container,
+  FormControl,
+  FormLabel,
+  MenuItem,
+  Select,
+  type SelectChangeEvent
+} from "@mui/material";
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 
 export default function Home() {
+  const [rollData, setRollData] = useState<RollData | undefined>(undefined);
+  const [numberOfDice, setNumberOfDice] = useState<number>(3);
+
+  const onRollDice = () => {
+    setRollData(getRollData(numberOfDice));
+  };
+
+  const onReset = () => {
+    setNumberOfDice(3);
+    setRollData(undefined);
+  };
+
+  const onNumberOfDiceChange = (event: SelectChangeEvent<number>): void => {
+    setNumberOfDice(event.target.value)
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      <Container maxWidth="sm" className="mt-6 flex flex-col justify-center items-center gap-6">
+        <h1 className="text-4xl text-green-700">Dice Game</h1>
+          <FormControl size="small">
+            <FormLabel id="number-of-dice-label" className="text-indigo-600">Number of Dice</FormLabel>
+            <Select value={numberOfDice} onChange={onNumberOfDiceChange}
+                    labelId="number-of-dice-label">
+              <MenuItem value={1}>One</MenuItem>
+              <MenuItem value={2}>Two</MenuItem>
+              <MenuItem value={3}>Three</MenuItem>
+              <MenuItem value={4}>Four</MenuItem>
+              <MenuItem value={5}>Five</MenuItem>
+            </Select>
+          </FormControl>
+          {
+            (rollData != undefined) ?
+                <DiceDisplay values={rollData?.values} /> :
+                <h3 className="text-xl text-orange-700">No dice rolled yet</h3>
+          }
+        <p className="text-2xl text-bold text-indigo-600">
+          <label>Total</label>: {rollData?.total ?? 0}
+        </p>
+        <p>
+          <Button variant="contained" color="primary" onClick={onRollDice}>Roll <CheckIcon/></Button>
+        </p>
+        <p>
+          <Button variant="outlined" color="secondary" onClick={onReset}>Reset <ClearIcon/></Button>
+        </p>
+      </Container>
   );
 }
